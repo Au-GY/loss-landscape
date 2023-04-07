@@ -4,6 +4,7 @@ from torchvision import transforms
 import os
 import numpy as np
 import argparse
+from torch.utils import data
 
 def get_relative_path(file):
     script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
@@ -80,6 +81,55 @@ def load_dataset(dataset='cifar10', datapath='cifar10/data', batch_size=128, \
 
     return train_loader, test_loader
 
+def load_imagenet(imagenet_path: str, batch_size=16, num_worker=0, 
+                  sets=["train", "val"]):
+    """
+
+    This function will load `num_imgs_per_class` images from every folder of `classes_name`
+    as the order of their file_name. `num_skip_imgs` determined how many imgs to skip of
+    each class. If `class_names` is not passed, it will be set to all 1000 classes by default.
+
+    `sets` is a list consist of the datasets you want to load. "train", "val" and "filtered_val" are supported.
+
+    `imagenet_path` should be like this:
+    ```
+        imagenet_path
+        ├── ILSVRC2012_devkit_t12.tar.gz
+        ├── ILSVRC2012_img_train.tar
+        └── ILSVRC2012_img_val.tar
+    ```
+    """
+
+    train_loader = None
+    val_loader = None
+
+    transform = transforms.Compose([
+        transforms.Resize((342, 342)),
+        transforms.CenterCrop(299),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
+
+    if "train" in sets:
+        train_folder = torchvision.datasets.ImageNet(
+            root=os.path.join(imagenet_path),
+            split="train",
+            transform=transform,
+        )
+        train_loader = data.DataLoader(
+            train_folder, batch_size=batch_size, shuffle=True, num_workers=num_worker)
+
+    # `label` will return indices
+    if "val" in sets:
+        val_folder = torchvision.datasets.ImageNet(
+            root=os.path.join(imagenet_path),
+            split="val",
+            transform=transform,
+        )
+        val_loader = data.DataLoader(dataset=val_folder, shuffle=True,
+                                     batch_size=batch_size, num_workers=num_worker)
+
+    return train_loader, val_loader
 
 ###############################################################
 ####                        MAIN
