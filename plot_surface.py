@@ -273,8 +273,8 @@ if __name__ == '__main__':
     # Setup dataloader
     #--------------------------------------------------------------------------
     # download CIFAR10 if it does not exit
-    if rank == 0 and args.dataset == 'cifar10':
-        torchvision.datasets.CIFAR10(root=args.dataset + '/data', train=True, download=True)
+    # if rank == 0 and args.dataset == 'cifar10':
+    #     torchvision.datasets.CIFAR10(root=args.dataset + '/data', train=True, download=True)
 
     mpi.barrier(comm)
 
@@ -287,13 +287,13 @@ if __name__ == '__main__':
             os.path.join("imagenet"),
             num_worker=args.threads,
             batch_size=args.batch_size,
-            sets=["train", "val"]
+            sets=["val"]
         )
 
     #--------------------------------------------------------------------------
     # Start the computation
     #--------------------------------------------------------------------------
-    crunch(surf_file, net, w, s, d, trainloader, 'train_loss', 'train_acc', comm, rank, args)
+    crunch(surf_file, net, w, s, d, valloader, 'train_loss', 'train_acc', comm, rank, args)
     # crunch(surf_file, net, w, s, d, testloader, 'test_loss', 'test_acc', comm, rank, args)
 
     #--------------------------------------------------------------------------
