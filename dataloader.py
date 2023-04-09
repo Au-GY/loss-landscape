@@ -126,7 +126,7 @@ def load_imagenet(imagenet_path: str, batch_size=16, num_worker=0,
             split="val",
             transform=transform,
         )
-        val_folder = data.Subset(val_folder, list(range(10)))
+        val_folder = data.Subset(val_folder, list(range(100)))
         val_loader = data.DataLoader(dataset=val_folder, shuffle=True,
                                      batch_size=batch_size, num_workers=num_worker)
 

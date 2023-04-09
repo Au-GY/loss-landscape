@@ -23,6 +23,7 @@ import plot_1D
 import model_loader
 import scheduler
 import mpi4pytorch as mpi
+from tqdm.auto import tqdm
 
 def name_surface_file(args, dir_file):
     # skip if surf_file is specified in args
@@ -106,7 +107,8 @@ def crunch(surf_file, net, w, s, d, dataloader, loss_key, acc_key, comm, rank, a
             criterion = nn.MSELoss()
 
         # Loop over all uncalculated loss values
-        for count, ind in enumerate(inds):
+        # for count, ind in enumerate(inds):
+        for count, ind in tqdm(enumerate(inds), total=len(inds), ncols=30):
             # Get the coordinates of the loss value being calculated
             coord = coords[count]
 
@@ -138,9 +140,12 @@ def crunch(surf_file, net, w, s, d, dataloader, loss_key, acc_key, comm, rank, a
                 f[acc_key][:] = accuracies
                 f.flush()
 
-            print('Evaluating rank %d  %d/%d  (%.1f%%)  coord=%s \t%s= %.3f \t%s=%.2f \ttime=%.2f \tsync=%.2f' % (
-                    rank, count, len(inds), 100.0 * count/len(inds), str(coord), loss_key, loss,
-                    acc_key, acc, loss_compute_time, syc_time))
+            # print('Evaluating rank %d  %d/%d  (%.1f%%)  coord=%s \t%s= %.3f \t%s=%.2f \ttime=%.2f \tsync=%.2f' % (
+            #         rank, count, len(inds), 100.0 * count/len(inds), str(coord), loss_key, loss,
+            #         acc_key, acc, loss_compute_time, syc_time))
+            print('  Evaluating rank %d  (%.1f%%)  coord=%s \t%s= %.3f \t%s=%.2f' % (
+                    rank, 100.0 * count/len(inds), str(coord), loss_key, loss,
+                    acc_key, acc))
 
         # This is only needed to make MPI run smoothly. If this process has less work than
         # the rank0 process, then we need to keep calling reduce so the rank0 process doesn't block
@@ -181,7 +186,7 @@ if __name__ == '__main__':
     parser.add_argument('--model_file3', default='', help='use (model_file3 - model_file) as the ydirection')
     parser.add_argument('--loss_name', '-l', default='crossentropy', help='loss functions: crossentropy | mse')
 
-    # direction parameters
+    # direction parametersd
     parser.add_argument('--dir_file', default='', help='specify the name of direction file, or the path to an eisting direction file')
     parser.add_argument('--dir_type', default='weights', help='direction type: weights | states (including BN\'s running_mean/var)')
     parser.add_argument('--x', default='-1:1:51', help='A string with format xmin:x_max:xnum')

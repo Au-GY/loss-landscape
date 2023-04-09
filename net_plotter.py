@@ -280,6 +280,9 @@ def name_direction_file(args):
 
     file1, file2, file3 = args.model_file, args.model_file2, args.model_file3
 
+    if not file1:
+        dir_file += args.model
+
     # name for xdirection
     if file2:
         # 1D linear interpolation between two models

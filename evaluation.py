@@ -33,7 +33,8 @@ def eval_loss(net, criterion, loader, use_cuda=False):
 
     with torch.no_grad():
         if isinstance(criterion, nn.CrossEntropyLoss):
-            for batch_idx, (inputs, targets) in tqdm(enumerate(loader), total=len(loader), ncols=80):
+            # for batch_idx, (inputs, targets) in tqdm(enumerate(loader), total=len(loader), ncols=80):
+            for batch_idx, (inputs, targets) in enumerate(loader):
                 batch_size = inputs.size(0)
                 total += batch_size
                 inputs = Variable(inputs)
@@ -47,7 +48,8 @@ def eval_loss(net, criterion, loader, use_cuda=False):
                 correct += predicted.eq(targets).sum().item()
 
         elif isinstance(criterion, nn.MSELoss):
-            for batch_idx, (inputs, targets) in tqdm(enumerate(loader), total=len(loader), ncols=80):
+            # for batch_idx, (inputs, targets) in tqdm(enumerate(loader), total=len(loader), ncols=80):
+            for batch_idx, (inputs, targets) in enumerate(loader):
                 batch_size = inputs.size(0)
                 total += batch_size
                 inputs = Variable(inputs)

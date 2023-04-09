@@ -42,7 +42,7 @@ models = {
 }
 
 def load(model_name, model_file=None, data_parallel=False):
-    net = models[model_name]()
+    net = models[model_name](pretrained=True)
     if data_parallel: # the model is saved in data paralle mode
         net = torch.nn.DataParallel(net)
 
